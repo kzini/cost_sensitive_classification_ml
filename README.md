@@ -1,4 +1,4 @@
-# Diagnóstico de câncer de mama com machine learning
+# Sistema de diagnóstico de câncer de mama com machine learning
 
 ## Objetivo do projeto
 
@@ -114,4 +114,4 @@ jupyter notebook notebooks/
 
 > Desenvolvido por Bruno Casini  
 > Contato: kzini1701@gmail.com  
-> LinkedIn: Em construção
+> LinkedIn: www.linkedin.com/in/kzini
