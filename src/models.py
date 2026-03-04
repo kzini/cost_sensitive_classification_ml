@@ -27,7 +27,6 @@ def train_logistic_regression(X_train, X_test, y_train, y_test, model_name, scal
         random_state=42
     )
     
-    # Cria o pipeline com ou sem scaling
     model = make_pipeline(model, scaling=scaling)
     
     return train_and_evaluate_model(

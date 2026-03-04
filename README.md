@@ -1,17 +1,17 @@
-# Sistema de diagnóstico de câncer de mama com machine learning
+# Estudo comparativo de estratégias de seleção de features e modelos em um problema de classificação sensível a falso negativo
+## Aplicação em diagnóstico de câncer de mama (Breast Cancer Wisconsin Dataset)
 
 ## Objetivo do projeto
 
-Desenvolver um modelo preditivo robusto e interpretável para classificar diagnósticos de câncer de mama 
-como malignos ou benignos, com foco em minimizar falsos negativos. Para isso, foi implementado um pipeline 
-completo de análise de dados, seleção de características e modelagem.
+Investigar o impacto de diferentes estratégias de seleção de features, redução de dimensionalidade e modelagem supervisionada em um problema de classificação binária sensível a falso negativo, utilizando o diagnóstico de câncer de mama como caso de estudo.
+Tendo como foco não apenas desempenho absoluto, mas a análise da estrutura do erro (FN vs FP), dos trade-offs entre métricas, da estabilidade em validação cruzada e da coerência entre decisões metodológicas e comportamento do modelo.
 
 ## Técnicas utilizadas
+### Foram avaliadas múltiplas estratégias de seleção de features e redução de dimensionalidade, incluindo:
 
-- Seleção de variáveis;
-- Seleção por correlação: a decisão de quais features correlacionadas deveriam ser mantidas foi baseada na análise das distribuições das classes 
-em gráficos de violino e de enxame, de modo a preservar as variáveis com maior poder discriminativo visual entre as classes;
+- Análise por correlação com inspeção visual (violino + swarmplot);
 - SelectKBest;
+- RFE;
 - Redução de dimensionalidade com PCA.
 
 ## Modelos avaliados
@@ -24,11 +24,11 @@ em gráficos de violino e de enxame, de modo a preservar as variáveis com maior
 
 ## Validação
 
-- StratifiedKFold com validação cruzada
+- Validação cruzada estratificada (StratifiedKFold)
 
-## Principais resultados
+## Critério de decisão e resultados
 
-O modelo escolhido: foi **XGBoost com hiperparâmetros otimizados**.
+O modelo final selecionado foi o XGBoost com hiperparâmetros otimizados, por apresentar o melhor equilíbrio entre recall, estabilidade em validação cruzada e controle de trade-off com precisão.
 
 | Métrica   | Valor   |
 |-----------|---------|
@@ -37,34 +37,37 @@ O modelo escolhido: foi **XGBoost com hiperparâmetros otimizados**.
 | F1-Score  | 0.9882  |
 | AUC       | 0.9964  |
 
+Resultados interpretados como:
 - Detecção eficaz de casos malignos;  
 - Nenhum falso positivo;
 - Estabilidade entre treino e validação cruzada.
 
 ## Decisão sobre balanceamento de classes
 
-O dataset tem distribuição relativamente equilibrada (62,74% vs 37,26%), então não apliquei técnicas de balanceamento no projeto final. Para lidar com o 
-desbalanceamento moderado, utilizei class_weight='balanced' apenas em modelos sensíveis, garantindo ponderação das classes sem alterar os dados reais. 
-Experimentos com undersampling e oversampling geraram overfitting, enquanto o uso de SMOTE não trouxe ganhos significativos nas métricas.
+O dataset apresenta distribuição moderadamente assimétrica (62,74% vs 37,26%), Por esse motivo, optei por não aplicar técnicas agressivas de reamostragem. 
 
-## Outras tentativas de aumentar o recall
+Para mitigar possível viés da classe majoritária, utilizei class_weight='balanced' em modelos sensíveis, ajustando a penalização dos erros sem alterar a estrutura original dos dados.
 
-- BalancedBaggingClassifier – sem melhorias.
-- Threshold Moving – conseguiu aumentar o recall, mas o trade-off com as demais métricas não compensou.
+Experimentos com undersampling e oversampling indicaram aumento de variância e indícios de overfitting. O uso de SMOTE não apresentou ganho consistente de recall ou melhoria estrutural nas métricas.
+
+## Outras estratégias avaliadas para aumento de Recall
+
+- Threshold Moving – reduções no limiar aumentaram marginalmente o recall, porém com queda substancial das demais métricas.
 
 ## Preparação para deploy
 
-O modelo final foi encapsulado em um Pipeline com pré-processamento padronizado e treinado novamente no conjunto de treino. 
-Ele foi salvo em 'models/xgboost_breast_cancer_fs_optimized.pkl' e é carregado pelo aplicativo interativo (app.py).
+O modelo final foi encapsulado em uma Pipeline reproduzível, treinada novamente no conjunto de treino e serializado em:  
+models/xgboost_breast_cancer_fs_optimized.pkl   
+Esse modelo é carregado pelo aplicativo interativo (app.py), permitindo simulação de predições e análise operacional do sistema.
 
 ## Lições Aprendidas
 
 - A importância de priorizar a métrica certa conforme o contexto (neste caso, Recall);
-- Como a seleção de variáveis pode impactar significativamente no desempenho dos modelos;
+- Como a seleção de features pode impactar no desempenho dos modelos;
 - O papel dos hiperparâmetros no refinamento do modelo;
 - A importância da validação cruzada para evitar overfitting;
 - Estratégias para lidar com balanceamento de classes e entender quando são realmente necessárias;
-- Dockerização.
+- Deploy.
 
 ## Estrutura do projeto
 
@@ -88,14 +91,14 @@ breast-cancer-classification/
 ## Dataset
 
 - **Fonte**: [Kaggle - Breast Cancer Wisconsin Dataset](https://www.kaggle.com/datasets/uciml/breast-cancer-wisconsin-data)
-- **Descrição**: Dados clínicos de exames de mama com rótulo binário (Maligno ou Benigno)
+- **Descrição**: Dados clínicos de exames de mama com rótulo binário (maligno ou benigno)
 
 ## Como Reproduzir
 
 ### 1. Clonar o repositório
 ```bash
-git clone https://github.com/kzini/breast-cancer-ml.git
-cd breast-cancer-ml
+git clone https://github.com/kzini/cost_sensitive_classification_ml.git
+cd cost_sensitive_classification_ml
 ```
 
 ### 2. Rodar o aplicativo interativo com Docker
@@ -109,9 +112,8 @@ Abra no navegador: http://localhost:8501
 ### 3. Reproduzir experimentos e análises
 ```bash
 pip install -r requirements.txt
-jupyter notebook notebooks/
+jupyter notebook notebook/
 ```
 
 > Desenvolvido por Bruno Casini  
-> Contato: kzini1701@gmail.com  
 > LinkedIn: www.linkedin.com/in/kzini
