@@ -1,3 +1,8 @@
+![Python](https://img.shields.io/badge/Python-3.10-blue)
+![ML](https://img.shields.io/badge/ML-Comparative_Study-purple)
+![Docker](https://img.shields.io/badge/Docker-Deploy-blue)
+![Streamlit](https://img.shields.io/badge/Streamlit-App-brightgreen)
+
 # Estudo comparativo de estratégias de seleção de features e modelos em um problema de classificação sensível a falso negativo
 ## Aplicação em diagnóstico de câncer de mama (Breast Cancer Wisconsin Dataset)
 
